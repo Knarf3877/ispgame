@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float speed = 6;
-    Vector3 velocity;
+    public float speed = 10f;
+    float forwardMovement;
+    float horizontalMovement;
     int coinCount;
     int fuelCount;
     Rigidbody myRigidBody;
@@ -19,14 +20,22 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 input = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
-        Vector3 direction = input.normalized;
-        velocity = direction * speed;
+         forwardMovement = Input.GetAxis("Vertical");
+           forwardMovement = forwardMovement * Time.deltaTime * speed;
+
+           horizontalMovement = Input.GetAxis("Horizontal");
+           horizontalMovement = horizontalMovement * Time.deltaTime * speed;
+       
     }
 
      void FixedUpdate()
     {
-        myRigidBody.position += velocity * Time.fixedDeltaTime;
+        //need to make this physics based
+        myRigidBody.transform.Translate(Vector3.forward * forwardMovement);
+        myRigidBody.transform.Translate(Vector3.right * horizontalMovement);
+        
+
+        
     }
 
     void OnTriggerEnter(Collider triggerCollider)
@@ -44,5 +53,6 @@ public class Player : MonoBehaviour
             print("You have: " + fuelCount + " " + triggerCollider.gameObject.tag);
         }
         
+     
     }
 }
