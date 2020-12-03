@@ -7,6 +7,7 @@ public class UnifiedPlayerControl : MonoBehaviour
     public float speed = 20;
     public float sideSpeed = 10;
     public float verticalSpeed = 6;
+    public float brakeSpeed = 2;
 
     private float activeSpeed;
     private float activeSideSpeed;
@@ -35,7 +36,7 @@ public class UnifiedPlayerControl : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         mouseLocation = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         //mouseLocation.x = Input.mousePosition.x;
@@ -59,6 +60,13 @@ public class UnifiedPlayerControl : MonoBehaviour
         transform.position += transform.right * activeSideSpeed * Time.deltaTime;
         transform.position += transform.up * activeVertSpeed * Time.deltaTime;
 
+        if (Input.GetKey(KeyCode.B))
+        {
+            Brake();
+        }
+        
+        
+
         //add speed dial
 
         totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
@@ -72,6 +80,15 @@ public class UnifiedPlayerControl : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    void Brake()
+    {
+        activeSideSpeed = Mathf.Lerp(activeSideSpeed, 0f, brakeSpeed * Time.deltaTime);
+        activeSpeed = Mathf.Lerp(activeSpeed, 0f, brakeSpeed * Time.deltaTime); ;
+        activeVertSpeed = Mathf.Lerp(activeVertSpeed, 0f, brakeSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.zero);
+        Debug.Log("brake applied");
     }
 
 }

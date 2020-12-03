@@ -41,13 +41,13 @@ public class LaserFire : MonoBehaviour
     {
         if(shootOrder == true)
         {
-            shootFromBarrel = leftBarrel.transform.position + transform.forward * 10f;
+            shootFromBarrel = leftBarrel.transform.position + transform.forward * 4f;
             shootOrder = !shootOrder;
 
         }
         else
         {
-            shootFromBarrel = rightBarrel.transform.position + transform.forward * 10f;
+            shootFromBarrel = rightBarrel.transform.position + transform.forward * 4f;
             shootOrder = !shootOrder;
         }
         GameObject tempLaser1 = Instantiate(laser1, shootFromBarrel, leftBarrel.transform.rotation);

@@ -18,8 +18,11 @@ public class HitDetection : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        ContactPoint contact = collision.contacts[0];
+        Vector3 contactPoint = contact.point;
         Destroy(gameObject);
         Debug.Log("Laser Hit");
-        Instantiate(explodeFX, this.transform.position, this.transform.rotation * Quaternion.Euler(0,-90,0));
+        GameObject smallExplosion = Instantiate(explodeFX, contactPoint, this.transform.rotation * Quaternion.Euler(0,-90,0));
+        Destroy(smallExplosion, 5f);
     }
 }

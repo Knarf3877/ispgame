@@ -9,6 +9,7 @@ public class ItemCollection : MonoBehaviour
     private float waitTime = 3f;
     public static int coinCount;
     public static int fuelCount;
+    public static int ammoCount;
     private void Start()
     {
         startPosition = this.transform.position;
@@ -17,18 +18,25 @@ public class ItemCollection : MonoBehaviour
     private void OnTriggerEnter(Collider triggerCollider)
     {
 
-        if (this.tag == "Coin")
+        if (this.tag == "Coin" && triggerCollider.tag == "Player")
         {
             this.transform.position = itemPool;
             coinCount++;
             Debug.Log("You have: " + coinCount + " " + this.tag);
             Invoke("Initialize", waitTime);
         } 
-        else if (this.tag == "Fuel")
+        else if (this.tag == "Fuel" && triggerCollider.tag == "Player")
         {
             this.transform.position = itemPool;
             fuelCount++;
             Debug.Log("You have: " + fuelCount + " " + this.tag);
+            Invoke("Initialize", waitTime);
+        } else if ((this.tag == "Ammo" && triggerCollider.tag == "Player"))
+        {
+            this.transform.position = itemPool;
+            ammoCount++;
+            LaserFire.laser1Ammo += 20;
+            Debug.Log("You have gained: " + ammoCount * 20 + " " + this.tag);
             Invoke("Initialize", waitTime);
         }
         
