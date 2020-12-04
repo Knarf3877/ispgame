@@ -7,34 +7,66 @@ public class LaserFire : MonoBehaviour
     // Start is called before the first frame update
     public GameObject leftBarrel;
     public GameObject rightBarrel;
+    public GameObject mainBarrel;
     public Vector3 shootFromBarrel;
     bool shootOrder = false;
 
     public GameObject laser1;
     public float laser1Force;
-
     public float laser1FireRate = .2f;
+
+    public GameObject laser2;
+    public float laser2Force;
+    public float laser2FireRate = .4f;
+
     private float timeLastFired;
 
+    int currentWeapon;
+
     static public int laser1Ammo = 100;
+    static public int laser2Ammo = 50;
 
     void Start()
     {
-        
+        currentWeapon = 1;
     }
+
+
 
     // Update is called once per frame
     void FixedUpdate()
     {
-
-        if (Input.GetMouseButton(0) && laser1Ammo > 0)
+        if (Input.GetKeyDown(KeyCode.Alpha1)) 
         {
-            if(Time.time> laser1FireRate + timeLastFired)
-            {
-                FireLaser1();
-                timeLastFired = Time.time;
-            } 
+            currentWeapon = 1;
 
+        }else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentWeapon = 2;
+        }
+
+        switch (currentWeapon)
+        {
+            case 1:
+                if (Input.GetMouseButton(0) && laser1Ammo > 0)
+                {
+                    if (Time.time > laser1FireRate + timeLastFired)
+                    {
+                        FireLaser1();
+                        timeLastFired = Time.time;
+                    }
+                }
+                break;
+            case 2:
+                if (Input.GetMouseButton(0) && laser2Ammo > 0)
+                {
+                    if (Time.time > laser2FireRate + timeLastFired)
+                    {
+                        FireLaser2();
+                        timeLastFired = Time.time;
+                    }
+                }
+                break;
         }
     }
     void FireLaser1()
@@ -44,8 +76,7 @@ public class LaserFire : MonoBehaviour
             shootFromBarrel = leftBarrel.transform.position + transform.forward * 4f;
             shootOrder = !shootOrder;
 
-        }
-        else
+        }else
         {
             shootFromBarrel = rightBarrel.transform.position + transform.forward * 4f;
             shootOrder = !shootOrder;
@@ -56,5 +87,15 @@ public class LaserFire : MonoBehaviour
         tempLaser1RigidBody.AddForce(transform.forward * laser1Force * Time.deltaTime * 1000f);
         Destroy(tempLaser1, 4f);
         laser1Ammo--;
+    }
+
+    void FireLaser2()
+    {
+        GameObject tempLaser2 = Instantiate(laser2, mainBarrel.transform.position + transform.forward * 6f, mainBarrel.transform.rotation);
+        tempLaser2.transform.Rotate(Vector3.left * 90f);
+        Rigidbody tempLaser2RigidBody = tempLaser2.GetComponent<Rigidbody>();
+        tempLaser2RigidBody.AddForce(transform.forward * laser1Force * Time.deltaTime * 1000f);
+        Destroy(tempLaser2, 4f);
+        laser2Ammo--;
     }
 }

@@ -26,6 +26,8 @@ public class UnifiedPlayerControl : MonoBehaviour
     public float rollAccerleration = 4;
     private float rollInput;
 
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,7 +48,8 @@ public class UnifiedPlayerControl : MonoBehaviour
         //mouseDistance.x = (mouseLocation.x - screenCenter.x) / screenCenter.x;
         //mouseDistance.y = (mouseLocation.y - screenCenter.y) / screenCenter.y;
 
-        //Debug.Log(mouseDistance);
+
+
 
         mouseDistance = Vector2.ClampMagnitude(mouseDistance, 1);
 
@@ -56,16 +59,18 @@ public class UnifiedPlayerControl : MonoBehaviour
         activeSideSpeed = Mathf.Lerp(activeSideSpeed, Input.GetAxisRaw("Horizontal") * sideSpeed, otherAccerleration * Time.deltaTime);
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, Input.GetAxisRaw("Height") * verticalSpeed, otherAccerleration * Time.deltaTime);
 
-        transform.position += transform.forward * activeSpeed * Time.deltaTime;
+        /*transform.position += transform.forward * activeSpeed * Time.deltaTime;
         transform.position += transform.right * activeSideSpeed * Time.deltaTime;
-        transform.position += transform.up * activeVertSpeed * Time.deltaTime;
+        transform.position += transform.up * activeVertSpeed * Time.deltaTime;*/
 
         if (Input.GetKey(KeyCode.B))
         {
             Brake();
         }
-        
-        
+
+        Rigidbody playerRB = GetComponent<Rigidbody>();
+        Vector3 movementForce = new Vector3(activeSpeed, activeSideSpeed, activeVertSpeed);
+        playerRB.AddRelativeForce(activeSideSpeed * 400f * Time.deltaTime, activeVertSpeed * 400f * Time.deltaTime, activeSpeed * 400f * Time.deltaTime);
 
         //add speed dial
 
