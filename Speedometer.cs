@@ -10,7 +10,10 @@ public class Speedometer : MonoBehaviour
     private void Update()
     {
         avgFrameRate = Mathf.Round(Time.frameCount / Time.time);
-        scoretext.GetComponent<Text>().text = UnifiedPlayerControl.totalSpeed.ToString("F0") + " mph\n" + avgFrameRate + " fps";
+        scoretext.GetComponent<Text>().text = UnifiedPlayerControl.totalSpeed.ToString("F0") + " mph" +
+            "\n" + avgFrameRate + " fps" +
+            "\n" + LaserFire.currentWeaponAmmo.ToString("F0") + " : ammo left" +
+            "\n" + UnifiedPlayerControl.throttle.ToString("F3");
     }
 
 }

@@ -21,7 +21,8 @@ public class LaserFire : MonoBehaviour
 
     private float timeLastFired;
 
-    int currentWeapon;
+    static public int currentWeapon;
+    static public int currentWeaponAmmo;
 
     static public int laser1Ammo = 100;
     static public int laser2Ammo = 50;
@@ -29,6 +30,7 @@ public class LaserFire : MonoBehaviour
     void Start()
     {
         currentWeapon = 1;
+        currentWeaponAmmo = laser1Ammo;
     }
 
 
@@ -39,10 +41,14 @@ public class LaserFire : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) 
         {
             currentWeapon = 1;
+            currentWeaponAmmo = laser1Ammo;
 
-        }else if (Input.GetKeyDown(KeyCode.Alpha2))
+
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             currentWeapon = 2;
+            currentWeaponAmmo = laser2Ammo;
         }
 
         switch (currentWeapon)
@@ -87,15 +93,17 @@ public class LaserFire : MonoBehaviour
         tempLaser1RigidBody.AddForce(transform.forward * laser1Force * Time.deltaTime * 1000f);
         Destroy(tempLaser1, 4f);
         laser1Ammo--;
+        currentWeaponAmmo--;
     }
 
     void FireLaser2()
     {
-        GameObject tempLaser2 = Instantiate(laser2, mainBarrel.transform.position + transform.forward * 6f, mainBarrel.transform.rotation);
+        GameObject tempLaser2 = Instantiate(laser2, mainBarrel.transform.position + transform.forward * 2f, mainBarrel.transform.rotation);
         tempLaser2.transform.Rotate(Vector3.left * 90f);
         Rigidbody tempLaser2RigidBody = tempLaser2.GetComponent<Rigidbody>();
         tempLaser2RigidBody.AddForce(transform.forward * laser1Force * Time.deltaTime * 1000f);
         Destroy(tempLaser2, 4f);
         laser2Ammo--;
+        currentWeaponAmmo--;
     }
 }

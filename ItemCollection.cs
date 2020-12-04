@@ -35,7 +35,17 @@ public class ItemCollection : MonoBehaviour
         {
             this.transform.position = itemPool;
             ammoCount++;
-            LaserFire.laser1Ammo += 20;
+            switch (LaserFire.currentWeapon)
+            {
+                case 1:
+                    LaserFire.laser1Ammo += 20;
+                    LaserFire.currentWeaponAmmo += 20;
+                    break;
+                case 2:
+                    LaserFire.laser2Ammo += 20;
+                    LaserFire.currentWeaponAmmo += 20;
+                    break;
+            }
             Debug.Log("You have gained: " + ammoCount * 20 + " " + this.tag);
             Invoke("Initialize", waitTime);
         }
