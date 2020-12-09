@@ -30,6 +30,7 @@ public class UnifiedPlayerControl : MonoBehaviour
     private float rollInput;
 
     public Texture2D crossHair, defaultCursor;
+    Rigidbody playerRB;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +38,9 @@ public class UnifiedPlayerControl : MonoBehaviour
         screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
 
         Cursor.lockState = CursorLockMode.Confined;
-        Cursor.SetCursor(crossHair, new Vector2(crossHair.width / 2, crossHair.height / 2 + 1), CursorMode.Auto);
+        Cursor.visible = false;
+        //Cursor.SetCursor(crossHair, new Vector2(crossHair.width / 2, crossHair.height / 2 + 1), CursorMode.Auto);
+
     }
 
 
@@ -95,16 +98,33 @@ public class UnifiedPlayerControl : MonoBehaviour
         if (Input.GetKey(KeyCode.Escape))
         {
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
+            Cursor.visible = !Cursor.visible;
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    void OnCollisionEnter()
+    {
+        //Rigidbody playerRB = GetComponent<Rigidbody>();
+        //playerRB.AddRelativeForce(-activeSideSpeed * 400f * Time.deltaTime, -activeVertSpeed * 400f * Time.deltaTime, -activeSpeed * 400f * Time.deltaTime);
+        //transform.position = Vector3.Lerp(transform.position, transform.position - Vector3.one * 13f, 10f * Time.deltaTime);
+        throttle = -1f;
+        Invoke("setZero", 1.4f);
+        Debug.Log("hit object");
+    }
+
+    void setZero()
+    {
+        throttle = 0;
     }
 
     void Brake()
     {
         throttle = Mathf.Lerp(throttle, 0f, brakeSpeed * Time.deltaTime);
-        activeSpeed = Mathf.Lerp(activeSpeed, 0f, brakeSpeed * Time.deltaTime); ;
+        activeSideSpeed = Mathf.Lerp(activeSideSpeed, 0f, brakeSpeed * Time.deltaTime); ;
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, 0f, brakeSpeed * Time.deltaTime);
         transform.Rotate(Vector3.zero);
+        Debug.Log("braked");
     }
 
 }
