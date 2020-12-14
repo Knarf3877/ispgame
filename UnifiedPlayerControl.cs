@@ -29,6 +29,7 @@ public class UnifiedPlayerControl : MonoBehaviour
     public float rollAccerleration = 4;
     private float rollInput;
 
+
     public Texture2D crossHair, defaultCursor;
     Rigidbody playerRB;
 
@@ -41,8 +42,22 @@ public class UnifiedPlayerControl : MonoBehaviour
         Cursor.visible = false;
         //Cursor.SetCursor(crossHair, new Vector2(crossHair.width / 2, crossHair.height / 2 + 1), CursorMode.Auto);
 
+
     }
 
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.G))
+        {
+            Debug.Log("this is working");
+            gameObject.GetComponent<SU_TravelWarp>().Warp = true;
+
+        }
+        else
+        {
+            gameObject.GetComponent<SU_TravelWarp>().Warp = false;
+        }
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -87,6 +102,16 @@ public class UnifiedPlayerControl : MonoBehaviour
         Vector3 movementForce = new Vector3(activeSpeed, activeSideSpeed, activeVertSpeed);
         playerRB.AddRelativeForce(activeSideSpeed * 400f * Time.deltaTime, activeVertSpeed * 400f * Time.deltaTime, activeSpeed * 400f * Time.deltaTime);
 
+        if (Input.GetKey(KeyCode.G))
+        {
+            mouseLookSpeed = 10f;
+            playerRB.AddRelativeForce(0, 0, 500000f * Time.deltaTime);
+        }
+        else
+        {
+            mouseLookSpeed = 300f;
+        }
+
         //add speed dial
 
         totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
@@ -101,7 +126,9 @@ public class UnifiedPlayerControl : MonoBehaviour
             Cursor.visible = !Cursor.visible;
             Cursor.lockState = CursorLockMode.None;
         }
+
     }
+
 
     void OnCollisionEnter()
     {
