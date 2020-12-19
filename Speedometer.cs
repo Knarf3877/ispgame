@@ -15,9 +15,11 @@ public class Speedometer : MonoBehaviour
         scoretext.GetComponent<Text>().text = UnifiedPlayerControl.totalSpeed.ToString("F0") + " mph" +
             "\n" + avgFrameRate + " fps" +
             "\n" + LaserFire.currentWeaponAmmo.ToString("F0") + " : ammo left" +
+            "\n" + UnifiedPlayerControl.warpFuel.ToString("F0") + " : fuel left" +
             "\n" + UnifiedPlayerControl.throttle.ToString("F3") +
-             "\n" + DamagePlayer.playerHealth.ToString("F0") +
-             "\n" + DamagePlayer.playerShield.ToString("F0");
+            "\n" + DamagePlayer.playerHealth.ToString("F0") +
+            "\n" + DamagePlayer.playerShield.ToString("F0");
+            
         healthBar.fillAmount = DamagePlayer.playerHealth / 100;
         shieldBar.fillAmount = DamagePlayer.playerShield / 100;
     }

@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class UnifiedPlayerControl : MonoBehaviour
 {
-    public float speed = 20;
+    public float speed = 40;
     public float sideSpeed = 10;
     public float verticalSpeed = 6;
-    public float brakeSpeed = 2;
+    public float brakeSpeed = 4;
 
     private float activeSpeed;
     private float vertAxis;
@@ -16,6 +16,8 @@ public class UnifiedPlayerControl : MonoBehaviour
     private float activeSideSpeed;
     private float activeVertSpeed;
     static public float totalSpeed;
+    static public bool warping;
+    static public float warpFuel = 100f;
 
     private float forwardAccerleration = 2;
     private float otherAccerleration = 1.25f;
@@ -29,25 +31,29 @@ public class UnifiedPlayerControl : MonoBehaviour
     public float rollAccerleration = 4;
     private float rollInput;
 
+    public GameObject mainCamera;
 
-    public Texture2D crossHair, defaultCursor;
+    public GameObject mainEngine;
+    public GameObject reverseEngine;
+
     Rigidbody playerRB;
 
     // Start is called before the first frame update
     void Start()
     {
+
         screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
 
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
-        //Cursor.SetCursor(crossHair, new Vector2(crossHair.width / 2, crossHair.height / 2 + 1), CursorMode.Auto);
+        mainEngine.SetActive(false); 
+        reverseEngine.SetActive(false);
 
+        StartCoroutine(AutoRefuel());
 
     }
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.G))
+        if (Input.GetKey(KeyCode.G) && warpFuel > 0)
         {
             Debug.Log("this is working");
             gameObject.GetComponent<SU_TravelWarp>().Warp = true;
@@ -56,6 +62,17 @@ public class UnifiedPlayerControl : MonoBehaviour
         else
         {
             gameObject.GetComponent<SU_TravelWarp>().Warp = false;
+        }
+
+        if(throttle > 0)
+        {
+            mainEngine.SetActive(true);
+            reverseEngine.SetActive(false);
+        }
+        else if (throttle < 0)
+        {
+            mainEngine.SetActive(false);
+            reverseEngine.SetActive(true);
         }
     }
 
@@ -89,10 +106,6 @@ public class UnifiedPlayerControl : MonoBehaviour
         activeSideSpeed = Mathf.Lerp(activeSideSpeed, Input.GetAxisRaw("Horizontal") * sideSpeed, otherAccerleration * Time.deltaTime);
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, Input.GetAxisRaw("Height") * verticalSpeed, otherAccerleration * Time.deltaTime);
 
-        /*transform.position += transform.forward * activeSpeed * Time.deltaTime;
-        transform.position += transform.right * activeSideSpeed * Time.deltaTime;
-        transform.position += transform.up * activeVertSpeed * Time.deltaTime;*/
-
         if (Input.GetKey(KeyCode.B))
         {
             Brake();
@@ -102,39 +115,52 @@ public class UnifiedPlayerControl : MonoBehaviour
         Vector3 movementForce = new Vector3(activeSpeed, activeSideSpeed, activeVertSpeed);
         playerRB.AddRelativeForce(activeSideSpeed * 400f * Time.deltaTime, activeVertSpeed * 400f * Time.deltaTime, activeSpeed * 400f * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.G))
+        if (Input.GetKey(KeyCode.G) && warpFuel > 0)
         {
-            mouseLookSpeed = 10f;
-            playerRB.AddRelativeForce(0, 0, 500000f * Time.deltaTime);
+            mainCamera.SetActive(false);
+            mouseLookSpeed = 20f;
+            playerRB.AddRelativeForce(0, 0, 10000f * Time.deltaTime);
+            warping = true;
+            warpFuel -= .5f;
         }
         else
         {
+            mainCamera.SetActive(true);
             mouseLookSpeed = 300f;
+            warping = false;
         }
-
-        //add speed dial
 
         totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
         totalSpeed = Mathf.Round(totalSpeed * 10);
-        //Debug.Log(totalSpeed);
 
         rollInput = Mathf.Lerp(rollInput, Input.GetAxis("Roll"), rollAccerleration * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = CursorLockMode.None;
-        }
-
     }
 
+    IEnumerator AutoRefuel()
+    {
+        yield return new WaitForSeconds(1f);
+        while (true)
+        {
+            if (warpFuel < 10 && warping == false)
+            {
+                yield return new WaitForSeconds(.8f);
+                warpFuel++;
+            }
+            else if (warpFuel < 20 && warping == false)
+            {
+                yield return new WaitForSeconds(.5f);
+                warpFuel++;
+            }
+            else
+            {
+                yield return null;
+            }
+        }
+    }
 
     void OnCollisionEnter()
     {
-        //Rigidbody playerRB = GetComponent<Rigidbody>();
-        //playerRB.AddRelativeForce(-activeSideSpeed * 400f * Time.deltaTime, -activeVertSpeed * 400f * Time.deltaTime, -activeSpeed * 400f * Time.deltaTime);
-        //transform.position = Vector3.Lerp(transform.position, transform.position - Vector3.one * 13f, 10f * Time.deltaTime);
         throttle = -1f;
         Invoke("setZero", 1.4f);
         Debug.Log("hit object");
@@ -151,7 +177,7 @@ public class UnifiedPlayerControl : MonoBehaviour
         activeSideSpeed = Mathf.Lerp(activeSideSpeed, 0f, brakeSpeed * Time.deltaTime); ;
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, 0f, brakeSpeed * Time.deltaTime);
         transform.Rotate(Vector3.zero);
-        Debug.Log("braked");
+        //Debug.Log("braked");
     }
 
 }
