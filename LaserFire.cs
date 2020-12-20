@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class LaserFire : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public static bool canFire;
+
     public GameObject leftBarrel;
     public GameObject rightBarrel;
     public GameObject mainBarrel;
@@ -31,6 +32,7 @@ public class LaserFire : MonoBehaviour
     {
         currentWeapon = 1;
         currentWeaponAmmo = laser1Ammo;
+        canFire = true;
     }
 
 
@@ -50,29 +52,30 @@ public class LaserFire : MonoBehaviour
             currentWeapon = 2;
             currentWeaponAmmo = laser2Ammo;
         }
-
-        switch (currentWeapon)
-        {
-            case 1:
-                if (Input.GetMouseButton(0) && laser1Ammo > 0)
-                {
-                    if (Time.time > laser1FireRate + timeLastFired)
+        if (UnifiedPlayerControl.warping == false) {
+            switch (currentWeapon)
+            {
+                case 1:
+                    if (Input.GetMouseButton(0) && laser1Ammo > 0)
                     {
-                        FireLaser1();
-                        timeLastFired = Time.time;
+                        if (Time.time > laser1FireRate + timeLastFired)
+                        {
+                            FireLaser1();
+                            timeLastFired = Time.time;
+                        }
                     }
-                }
-                break;
-            case 2:
-                if (Input.GetMouseButton(0) && laser2Ammo > 0)
-                {
-                    if (Time.time > laser2FireRate + timeLastFired)
+                    break;
+                case 2:
+                    if (Input.GetMouseButton(0) && laser2Ammo > 0)
                     {
-                        FireLaser2();
-                        timeLastFired = Time.time;
+                        if (Time.time > laser2FireRate + timeLastFired)
+                        {
+                            FireLaser2();
+                            timeLastFired = Time.time;
+                        }
                     }
-                }
-                break;
+                    break;
+            }
         }
     }
     void FireLaser1()

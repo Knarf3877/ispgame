@@ -34,8 +34,9 @@ public class UnifiedPlayerControl : MonoBehaviour
     public GameObject mainCamera;
 
     public GameObject mainEngine;
+    public ParticleSystem mainThrust;
     public GameObject reverseEngine;
-
+    public ParticleSystem reverseThrust;
     Rigidbody playerRB;
 
     // Start is called before the first frame update
@@ -64,15 +65,20 @@ public class UnifiedPlayerControl : MonoBehaviour
             gameObject.GetComponent<SU_TravelWarp>().Warp = false;
         }
 
-        if(throttle > 0)
+        if(throttle > 0.001)
         {
             mainEngine.SetActive(true);
             reverseEngine.SetActive(false);
         }
-        else if (throttle < 0)
+        else if (throttle < -0.001)
         {
             mainEngine.SetActive(false);
             reverseEngine.SetActive(true);
+        }
+        else 
+        {
+            mainEngine.SetActive(false);
+            reverseEngine.SetActive(false);
         }
     }
 
@@ -100,7 +106,7 @@ public class UnifiedPlayerControl : MonoBehaviour
         mouseDistance = new Vector2((mouseLocation.x - screenCenter.x) / screenCenter.x, (mouseLocation.y - screenCenter.y) / screenCenter.y);
         mouseDistance = Vector2.ClampMagnitude(mouseDistance, 1);
 
-        transform.Rotate(-mouseDistance.y * Time.deltaTime * mouseLookSpeed, mouseDistance.x * Time.deltaTime * mouseLookSpeed, rollSpeed * Time.deltaTime * -rollInput, Space.Self);
+        transform.Rotate(-mouseDistance.y * Time.deltaTime * mouseLookSpeed / 2, mouseDistance.x * Time.deltaTime * mouseLookSpeed / 2, rollSpeed * Time.deltaTime * -rollInput, Space.Self);
 
         activeSpeed = Mathf.Lerp(activeSpeed, throttle * speed, forwardAccerleration * Time.deltaTime);
         activeSideSpeed = Mathf.Lerp(activeSideSpeed, Input.GetAxisRaw("Horizontal") * sideSpeed, otherAccerleration * Time.deltaTime);
@@ -119,7 +125,7 @@ public class UnifiedPlayerControl : MonoBehaviour
         {
             mainCamera.SetActive(false);
             mouseLookSpeed = 20f;
-            playerRB.AddRelativeForce(0, 0, 10000f * Time.deltaTime);
+            playerRB.AddRelativeForce(0, 0, 11000f * Time.deltaTime);
             warping = true;
             warpFuel -= .5f;
         }

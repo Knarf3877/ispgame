@@ -5,16 +5,31 @@ using UnityEngine;
 public class ItemCollection : MonoBehaviour
 {
     Vector3 startPosition;
-    public Vector3 itemPool = new Vector3 (1000,1000,1000);
+    public Vector3 itemPool = new Vector3 (10000,10000,10000);
     private float waitTime = 3f;
     public static int coinCount;
     public static int fuelCount;
     public static int ammoCount;
+
+    Transform player;
+    public float collectDistance;
+    Rigidbody magnet;
     private void Start()
     {
         startPosition = this.transform.position;
-    }
+        magnet = GetComponent<Rigidbody>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
 
+    }
+    private void Update()
+    {
+        collectDistance = Vector3.Distance(transform.position, player.transform.position);
+        if (collectDistance < 6f)
+        {
+
+            magnet.AddForce((player.transform.position - transform.position) * (36));
+        }
+    }
     private void OnTriggerEnter(Collider triggerCollider)
     {
 
@@ -29,9 +44,11 @@ public class ItemCollection : MonoBehaviour
         {
             this.transform.position = itemPool;
             fuelCount++;
+            UnifiedPlayerControl.warpFuel += 20;
             Debug.Log("You have: " + fuelCount + " " + this.tag);
             Invoke("Initialize", waitTime);
-        } else if ((this.tag == "Ammo" && triggerCollider.tag == "Player"))
+        } 
+        else if (this.tag == "Ammo" && triggerCollider.tag == "Player")
         {
             this.transform.position = itemPool;
             ammoCount++;
@@ -54,6 +71,8 @@ public class ItemCollection : MonoBehaviour
     void Initialize()
     {
         this.transform.position = startPosition;
+        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         Debug.Log("Respawn completed at : " + Time.time);
         Debug.Log("Item Respawned");
     }

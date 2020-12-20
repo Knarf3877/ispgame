@@ -31,13 +31,13 @@ public class CursorSight : MonoBehaviour
         {
             Vector3 staticPos = (player.transform.forward * staticCursorDistance) + player.transform.position;
             Vector3 screenPos = Camera.main.WorldToScreenPoint(staticPos);
-            screenPos.z = -3f;
+            screenPos.z = -12f;
 
-            staticCursor.transform.position = Vector3.Lerp(staticCursor.transform.position, screenPos, Time.deltaTime * 2f);
+            staticCursor.transform.position = Vector3.Lerp(staticCursor.transform.position, screenPos, Time.deltaTime * 6f);
         }
         if (activeCursor != null && player != null)
         {
-            activeCursor.transform.position = Input.mousePosition;
+            activeCursor.transform.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y - 32f, Input.mousePosition.z);
         }
 
         if(UnifiedPlayerControl.warping == true)
