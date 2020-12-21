@@ -27,7 +27,7 @@ public class ItemCollection : MonoBehaviour
         if (collectDistance < 6f)
         {
 
-            magnet.AddForce((player.transform.position - transform.position) * (36));
+            magnet.AddForce((player.transform.position - transform.position) * (80));
         }
     }
     private void OnTriggerEnter(Collider triggerCollider)

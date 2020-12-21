@@ -9,24 +9,9 @@ public class CursorSight : MonoBehaviour
     public float staticCursorDistance = 500f;
     public Image activeCursor, staticCursor;
     // Start is called before the first frame update
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
-
-       /* activeCursor = GetComponent<Image>();
-        staticCursor = GetComponent<Image>();*/
-
-    }
-
-    // Update is called once per frame
     void LateUpdate()
     {
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = CursorLockMode.None;
-        }
+
         if (player != null)
         {
             Vector3 staticPos = (player.transform.forward * staticCursorDistance) + player.transform.position;

@@ -5,34 +5,41 @@ using UnityEngine;
 public class DamagePlayer : MonoBehaviour
 {
     public static float playerHealth = 100;
+    public static float defaultPlayerHealth;
     public static float playerShield = 100;
-    public bool isImmune;
-    public GameObject explosionFX;
+    public static float defaultPlayerShield;
 
-    // Start is called before the first frame update
+    public bool isImmune;
+    //public static bool warpDeath;
+
     void Start()
     {
         isImmune = false;
+        //warpDeath = false;
+        defaultPlayerHealth = playerHealth;
+        defaultPlayerShield = playerShield;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playerHealth <= 0)
-        {
-            DestroyPlayer();
-        }
     }
     private void OnCollisionEnter(Collision collision)
     {
+       
+        if (UnifiedPlayerControl.warping)
+        {
+            playerHealth -= 100;
+        }
+
         if (isImmune == false)
         {
             if (playerShield >= 15) {
-                playerShield -= 15;
+                playerShield -= 30;
             }
             else
             {
-                playerShield -= 15;
+                playerShield -= 30;
                 playerHealth -= Mathf.Abs(playerShield);
                 playerShield = 0;
             }           
@@ -45,9 +52,4 @@ public class DamagePlayer : MonoBehaviour
         isImmune = false;
     }
 
-    void DestroyPlayer()
-    {
-        Destroy(gameObject);
-        Instantiate(explosionFX, transform.position, transform.rotation);
-    }
 }

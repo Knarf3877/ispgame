@@ -18,11 +18,12 @@ public class UnifiedPlayerControl : MonoBehaviour
     static public float totalSpeed;
     static public bool warping;
     static public float warpFuel = 100f;
+    static public float defaultWarpFuel;
 
     private float forwardAccerleration = 2;
     private float otherAccerleration = 1.25f;
 
-    public float mouseLookSpeed = 300;
+    static public float mouseLookSpeed = 300;
     private Vector2 mouseDistance;
     private Vector2 mouseLocation;
     private Vector2 screenCenter;
@@ -34,10 +35,14 @@ public class UnifiedPlayerControl : MonoBehaviour
     public GameObject mainCamera;
 
     public GameObject mainEngine;
+    public GameObject mainEngineInput;
     public ParticleSystem mainThrust;
     public GameObject reverseEngine;
+    public GameObject reverseEngineInput;
     public ParticleSystem reverseThrust;
-    Rigidbody playerRB;
+    public GameObject warpEngine;
+
+    public Rigidbody playerRB;
 
     // Start is called before the first frame update
     void Start()
@@ -47,8 +52,12 @@ public class UnifiedPlayerControl : MonoBehaviour
 
         mainEngine.SetActive(false); 
         reverseEngine.SetActive(false);
+        warpEngine.SetActive(false);
 
         StartCoroutine(AutoRefuel());
+        Rigidbody playerRB = GetComponent<Rigidbody>();
+
+        defaultWarpFuel = warpFuel;
 
     }
 
@@ -56,29 +65,41 @@ public class UnifiedPlayerControl : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.G) && warpFuel > 0)
         {
-            Debug.Log("this is working");
             gameObject.GetComponent<SU_TravelWarp>().Warp = true;
-
         }
-        else
+        else if (Input.GetKeyUp(KeyCode.G))
         {
             gameObject.GetComponent<SU_TravelWarp>().Warp = false;
         }
 
         if(throttle > 0.001)
         {
-            mainEngine.SetActive(true);
-            reverseEngine.SetActive(false);
+           mainEngine.SetActive(true);
+           reverseEngine.SetActive(false);
         }
         else if (throttle < -0.001)
         {
-            mainEngine.SetActive(false);
-            reverseEngine.SetActive(true);
+           mainEngine.SetActive(false);
+           reverseEngine.SetActive(true);
         }
         else 
         {
-            mainEngine.SetActive(false);
-            reverseEngine.SetActive(false);
+           mainEngine.SetActive(false);
+           reverseEngine.SetActive(false);
+        }
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            mainEngineInput.SetActive(true);
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            reverseEngineInput.SetActive(true);
+        }
+        else
+        {
+            mainEngineInput.SetActive(false);
+            reverseEngineInput.SetActive(false);
         }
     }
 
@@ -106,41 +127,44 @@ public class UnifiedPlayerControl : MonoBehaviour
         mouseDistance = new Vector2((mouseLocation.x - screenCenter.x) / screenCenter.x, (mouseLocation.y - screenCenter.y) / screenCenter.y);
         mouseDistance = Vector2.ClampMagnitude(mouseDistance, 1);
 
+        rollInput = Mathf.Lerp(rollInput, Input.GetAxis("Roll"), rollAccerleration * Time.deltaTime);
+
         transform.Rotate(-mouseDistance.y * Time.deltaTime * mouseLookSpeed / 2, mouseDistance.x * Time.deltaTime * mouseLookSpeed / 2, rollSpeed * Time.deltaTime * -rollInput, Space.Self);
 
         activeSpeed = Mathf.Lerp(activeSpeed, throttle * speed, forwardAccerleration * Time.deltaTime);
         activeSideSpeed = Mathf.Lerp(activeSideSpeed, Input.GetAxisRaw("Horizontal") * sideSpeed, otherAccerleration * Time.deltaTime);
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, Input.GetAxisRaw("Height") * verticalSpeed, otherAccerleration * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.B))
-        {
-            Brake();
-        }
-
-        Rigidbody playerRB = GetComponent<Rigidbody>();
         Vector3 movementForce = new Vector3(activeSpeed, activeSideSpeed, activeVertSpeed);
         playerRB.AddRelativeForce(activeSideSpeed * 400f * Time.deltaTime, activeVertSpeed * 400f * Time.deltaTime, activeSpeed * 400f * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.G) && warpFuel > 0)
+        totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
+        totalSpeed = Mathf.Round(totalSpeed * 10);
+
+        if (Input.GetKey(KeyCode.G) && warpFuel > 0 && throttle > 0)
         {
             mainCamera.SetActive(false);
             mouseLookSpeed = 20f;
             playerRB.AddRelativeForce(0, 0, 11000f * Time.deltaTime);
             warping = true;
             warpFuel -= .5f;
+            totalSpeed += 100;
+            warpEngine.SetActive(true);
         }
-        else
+        else if(Input.GetKeyUp(KeyCode.G))
         {
             mainCamera.SetActive(true);
             mouseLookSpeed = 300f;
             warping = false;
+            warpEngine.SetActive(false);
         }
 
-        totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
-        totalSpeed = Mathf.Round(totalSpeed * 10);
+        
 
-        rollInput = Mathf.Lerp(rollInput, Input.GetAxis("Roll"), rollAccerleration * Time.deltaTime);
-
+        if (Input.GetKey(KeyCode.B))
+        {
+            Brake();
+        }
     }
 
     IEnumerator AutoRefuel()
@@ -167,7 +191,7 @@ public class UnifiedPlayerControl : MonoBehaviour
 
     void OnCollisionEnter()
     {
-        throttle = -1f;
+        throttle = -Mathf.Clamp(throttle, -.5f,.5f);
         Invoke("setZero", 1.4f);
         Debug.Log("hit object");
     }
@@ -175,15 +199,18 @@ public class UnifiedPlayerControl : MonoBehaviour
     void setZero()
     {
         throttle = 0;
+        playerRB.velocity = Vector3.zero;
+        playerRB.angularVelocity = Vector3.zero;
+
     }
 
     void Brake()
     {
         throttle = Mathf.Lerp(throttle, 0f, brakeSpeed * Time.deltaTime);
-        activeSideSpeed = Mathf.Lerp(activeSideSpeed, 0f, brakeSpeed * Time.deltaTime); ;
+        activeSideSpeed = Mathf.Lerp(activeSideSpeed, 0f, brakeSpeed * Time.deltaTime);
         activeVertSpeed = Mathf.Lerp(activeVertSpeed, 0f, brakeSpeed * Time.deltaTime);
         transform.Rotate(Vector3.zero);
-        //Debug.Log("braked");
+
     }
 
 }

@@ -27,12 +27,17 @@ public class LaserFire : MonoBehaviour
 
     static public int laser1Ammo = 100;
     static public int laser2Ammo = 50;
+    static public int defaultLaser1Ammo;
+    static public int defaultLaser2Ammo;
 
     void Start()
     {
         currentWeapon = 1;
         currentWeaponAmmo = laser1Ammo;
         canFire = true;
+
+        defaultLaser1Ammo = laser1Ammo;
+        defaultLaser2Ammo = laser2Ammo;
     }
 
 
