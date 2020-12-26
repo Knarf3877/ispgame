@@ -63,16 +63,15 @@ public class UnifiedPlayerControl : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.G) && warpFuel > 0)
-        {
-            gameObject.GetComponent<SU_TravelWarp>().Warp = true;
-        }
-        else if (Input.GetKeyUp(KeyCode.G))
-        {
-            gameObject.GetComponent<SU_TravelWarp>().Warp = false;
-        }
-
-        if(throttle > 0.001)
+        /* if (Input.GetKey(KeyCode.G) && warpFuel > 0)
+         {
+             gameObject.GetComponent<SU_TravelWarp>().Warp = true;
+         }
+         else if (Input.GetKeyUp(KeyCode.G))
+         {
+             gameObject.GetComponent<SU_TravelWarp>().Warp = false;
+         }*/
+        if (throttle > 0.001)
         {
            mainEngine.SetActive(true);
            reverseEngine.SetActive(false);
@@ -100,6 +99,25 @@ public class UnifiedPlayerControl : MonoBehaviour
         {
             mainEngineInput.SetActive(false);
             reverseEngineInput.SetActive(false);
+        }
+        if (Input.GetKey(KeyCode.G) && warpFuel > 0 && throttle > 0)
+        {
+            gameObject.GetComponent<SU_TravelWarp>().Warp = true;
+            mainCamera.SetActive(false);
+            mouseLookSpeed = 20f;
+            playerRB.AddRelativeForce(0, 0, 11000f * Time.deltaTime);
+            warping = true;
+            warpFuel -= .5f;
+            totalSpeed += 100;
+            warpEngine.SetActive(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.G))
+        {
+            gameObject.GetComponent<SU_TravelWarp>().Warp = false;
+            mainCamera.SetActive(true);
+            mouseLookSpeed = 300f;
+            warping = false;
+            warpEngine.SetActive(false);
         }
     }
 
@@ -141,7 +159,7 @@ public class UnifiedPlayerControl : MonoBehaviour
         totalSpeed = Mathf.Sqrt((activeSpeed * activeSpeed) + (activeSideSpeed * activeSideSpeed) + (activeVertSpeed * activeVertSpeed));
         totalSpeed = Mathf.Round(totalSpeed * 10);
 
-        if (Input.GetKey(KeyCode.G) && warpFuel > 0 && throttle > 0)
+/*        if (Input.GetKey(KeyCode.G) && warpFuel > 0 && throttle > 0)
         {
             mainCamera.SetActive(false);
             mouseLookSpeed = 20f;
@@ -157,7 +175,7 @@ public class UnifiedPlayerControl : MonoBehaviour
             mouseLookSpeed = 300f;
             warping = false;
             warpEngine.SetActive(false);
-        }
+        }*/
 
         
 
@@ -177,9 +195,9 @@ public class UnifiedPlayerControl : MonoBehaviour
                 yield return new WaitForSeconds(.8f);
                 warpFuel++;
             }
-            else if (warpFuel < 20 && warping == false)
+            else if (warpFuel < 30 && warping == false)
             {
-                yield return new WaitForSeconds(.5f);
+                yield return new WaitForSeconds(.45f);
                 warpFuel++;
             }
             else
