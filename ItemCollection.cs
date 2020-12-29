@@ -10,9 +10,10 @@ public class ItemCollection : MonoBehaviour
     public static int coinCount;
     public static int fuelCount;
     public static int ammoCount;
+    public static int healthCount;
 
     Transform player;
-    public float collectDistance;
+    float collectDistance;
     Rigidbody magnet;
     private void Start()
     {
@@ -47,7 +48,16 @@ public class ItemCollection : MonoBehaviour
             UnifiedPlayerControl.warpFuel += 20;
             Debug.Log("You have: " + fuelCount + " " + this.tag);
             Invoke("Initialize", waitTime);
-        } 
+        }
+        else if (this.tag == "Health" && triggerCollider.tag == "Player")
+        {
+            this.transform.position = itemPool;
+            healthCount++;
+            DamagePlayer.playerShield += 20;
+            DamagePlayer.playerShield = Mathf.Clamp(DamagePlayer.playerShield, 0, 100);
+            Debug.Log("You have: " + healthCount + " " + this.tag);
+            Invoke("Initialize", waitTime);
+        }
         else if (this.tag == "Ammo" && triggerCollider.tag == "Player")
         {
             this.transform.position = itemPool;
