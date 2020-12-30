@@ -13,6 +13,7 @@ public class HitDetection : MonoBehaviour
     private float destructionTime = 0f;
     private bool isFired = false;
     private const float kVelocityMult = 1f;
+    public float damage = 10f;
 
     [SerializeField] private bool adjustLaser;
 
@@ -38,7 +39,7 @@ public class HitDetection : MonoBehaviour
 
         if (useFixedUpdate == true)
         {
-            MoveBullet();
+            MoveBullet(damage);
         }
     }
 
@@ -58,7 +59,7 @@ public class HitDetection : MonoBehaviour
 
     }
 
-    public void MoveBullet()
+    public void MoveBullet(float damage)
     {
         // Perform the raycast. Shoots a ray forwards of the bullet that covers all the distance
         // that it will cover in this frame. This guarantees a hit in all but the most extenuating
@@ -67,11 +68,19 @@ public class HitDetection : MonoBehaviour
         RaycastHit rayHit;
         Ray velocityRay = new Ray(transform.position, velocity.normalized);
         bool rayHasHit = Physics.Raycast(velocityRay, out rayHit, velocity.magnitude * kVelocityMult * Time.deltaTime, hitMask);
-
+        
         if (rayHasHit == true)
         {
-            // Bullet hit something.
-            // Put code here to damage the thing you hit using your components.
+
+            GameObject rayHitGameObject = rayHit.transform.gameObject;
+            EnemyStats target = rayHitGameObject.GetComponent<EnemyStats>();
+          //  bool hitSelf = false;
+            if (target)
+            {
+                    print("Hit " + target.name + " with " + target.health + " HP left.");
+                    target.ApplyDamage(damage);
+            }
+
             DestroyBullet(rayHit.point, true);
         }
         else
@@ -87,13 +96,11 @@ public class HitDetection : MonoBehaviour
     {
         if (fromImpact == true && explodeFX != null)
         {
-            ParticleSystem tempExplodeFX = Instantiate(explodeFX, transform.position, transform.rotation);
-           // tempExplodeFX.Play();
+            ParticleSystem tempExplodeFX = Instantiate(explodeFX, transform.position, transform.rotation);   
             Destroy(tempExplodeFX.gameObject, 1f);
-        }
 
-        Destroy(gameObject);
-        
+        }
+        Destroy(gameObject);        
     }
 /*    private void OnCollisionEnter(Collision collision)
     {
