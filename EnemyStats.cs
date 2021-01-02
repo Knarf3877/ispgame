@@ -19,7 +19,6 @@ public class EnemyStats : MonoBehaviour
     {
         health = defaultHealth;
         respawnLocation = transform.position;
-        Debug.Log("test");
     }
 
     // Update is called once per frame
@@ -34,7 +33,7 @@ public class EnemyStats : MonoBehaviour
     }
     void OnTriggerEnter(Collider triggerCollider)
     {
-        Debug.Log(this.name + " got hit by " + triggerCollider.name);
+        //Debug.Log(this.name + " got hit by " + triggerCollider.name);
 
         if (this.tag == "Enemy" && triggerCollider.tag == "Player")
         {
@@ -55,10 +54,16 @@ public class EnemyStats : MonoBehaviour
         GameObject tempEnemyFX = Instantiate(deathFX, transform.position, transform.rotation);
         Destroy(tempEnemyFX, 6f);
         transform.position = enemyPool;
+        gameObject.SetActive(false);
+
     }
 
     void RespawnSelf()
     {
+        gameObject.SetActive(true);
         transform.position = respawnLocation;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 }
