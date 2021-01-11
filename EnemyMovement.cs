@@ -8,14 +8,38 @@ public class EnemyMovement : MonoBehaviour
     [Range(-1, 1)] public float Pitch = 0f;
     [Range(-1, 1)] public float Yaw = 0f;
     [Range(-1, 1)] public float Roll = 0f;
+    private const float Multiplier = .015f;
+
+    private float activeSpeed;
+    private float forwardAccerleration = 2;
 
     [Header("Combat")]
     public Transform FollowTarget = null;
     public GameObject AttackTarget = null;
     public bool IsFiring = false;
-    public float MaxTurnPower = 0.6f;
+    public float MaxTurnPower = 100f;
     [Range(0f, 1f)]
-    public float FireChance = 0.5f;
+    public float FireChance = 1f;
+    public GameObject barrel;
+
+    public EnemyHitDetection weaponShot;
+    public int weaponType;
+    private float weaponForce;
+    public float weaponSpread;
+    private float weaponFireRate;
+    private float timeLastFired;
+
+    private float laser1Force = 1500f;
+    private float laser1FireRate = .2f;
+    [SerializeField] private float l1Spread = 0.15f;
+
+    private float laser2Force = 2500f;
+    private float laser2FireRate = .4f;
+    [SerializeField] private float l2Spread = 0f;
+
+    private float laser3Force = 1500f;
+    private float laser3FireRate = .1f;
+    [SerializeField] private float l3Spread = 0.5f;
 
     //public Target ownTarget = null;
     //public Ship ownShip = null;
@@ -30,7 +54,8 @@ public class EnemyMovement : MonoBehaviour
 
     //private List<Target> potentialTargets = new List<Target>();
 
-    private Vector3 preferredAvoidOffset = Vector3.right * 200f;
+    private Vector3 preferredAvoidOffset = Vector3.right * 350f;
+    private Vector3 currentTurnTowards;
     private float seed = 0f;
 
     public bool IsFireAllowed => Mathf.PerlinNoise(seed, Time.time / 10f) < FireChance;
@@ -44,15 +69,39 @@ public class EnemyMovement : MonoBehaviour
     public void Init()
     {
         seed = Random.Range(0f, 1000f);
-        preferredAvoidOffset = Random.onUnitSphere * 200f;
+        preferredAvoidOffset = Random.onUnitSphere * 350f;
     }
     private void Start()
     {
         Init();
         FindTarget();
-
+        switch (weaponType)
+        {
+            case 1:
+                weaponForce = laser1Force;
+                weaponSpread = l1Spread;
+                weaponFireRate = laser1FireRate;
+                break;
+            case 2:
+                weaponForce = laser2Force;
+                weaponSpread = l2Spread;
+                weaponFireRate = laser2FireRate;
+                break;
+            case 3:
+                weaponForce = laser3Force;
+                weaponSpread = l3Spread;
+                weaponFireRate = laser3FireRate;
+                break;
+        }
     }
-
+    private void Update()
+    {
+        if (IsFiring && (Time.time > weaponFireRate + timeLastFired))
+        {
+            Fire();
+            timeLastFired = Time.time;
+        }
+    }
     private void FixedUpdate()
     {
         RunAI();
@@ -66,10 +115,7 @@ public class EnemyMovement : MonoBehaviour
             FindTarget();
         else
         {
-            /*            if (AttackTarget.IsCapital)
-                            StrafeTarget();
-                        else
-                            DogfightTarget();*/
+            DogfightTarget();
         }
 
         if (AttackTarget == null)
@@ -97,7 +143,7 @@ public class EnemyMovement : MonoBehaviour
 
             if (AttackTarget == null)
             {
-                //AttackTarget = target;
+                AttackTarget = target;
 
                 //FindTarget();
                 /*if (AttackTarget != null && AttackTarget.IsCapital)
@@ -156,52 +202,57 @@ public class EnemyMovement : MonoBehaviour
              }
          }
      }*/
-    /* private void DogfightTarget()
+     private void DogfightTarget()
      {
          if (AttackTarget == null)
              return;
 
          // Evasive maneuvers!
-         var distance = Vector3.Distance(AttackTarget.Position, ownTarget.Position);
-         if (distance < 100f)
+         var distance = Vector3.Distance(AttackTarget.transform.position, this.transform.position);
+         if (distance < 5f)
          {
              IsFiring = false;
-             TurnTowards(AttackTarget.Position + preferredAvoidOffset);
-
+             //TurnTowards(AttackTarget.transform.position + preferredAvoidOffset);
+             TurnTowards(AttackTarget.transform.position + preferredAvoidOffset);
              Throttle = 0.4f;
          }
-         else
+         else if (distance < 300f)
          {
              // Get lead on target.
              var targetPoint = GunMaths.ComputeGunLead(
-                 AttackTarget.Position,
-                 AttackTarget.Velocity,
-                 ownTarget.Position,
-                 Vector3.zero,
-                 ownShip.Specs.Weapons.MuzzleVelocity);
+                 AttackTarget.transform.position ,
+                 AttackTarget.GetComponent<Rigidbody>().velocity,
+                 transform.position,
+                 transform.GetComponent<Rigidbody>().velocity,
+                 weaponForce);
 
              TurnTowards(targetPoint, Mathf.PerlinNoise(seed, Time.time / 10f) * MaxTurnPower);
-             var angleToTarget = Vector3.Angle(
-                 ownShip.transform.forward,
-                 AttackTarget.Position - ownTarget.Position);
+             var angleToTarget = Vector3.Angle(transform.forward, AttackTarget.transform.position - transform.position);
 
-             IsFiring = angleToTarget < 5f && IsFireAllowed && distance < 300f;
+             IsFiring = angleToTarget < 20f && IsFireAllowed && distance < 300f;
 
-             if (Vector3.Angle(AttackTarget.Forward, ownTarget.Forward) < 90)
-             {
-                 // Adjust throttle based on distance so faster ships don't overtake slower ones.
-                 Throttle = Maths.Remap(50f, 250f, .33f, .8f, distance);
-             }
-             else
-                 Throttle = 0.85f;
+/*             if (Vector3.Angle(AttackTarget.transform.forward, transform.forward) < 90)
+                        {
+                            // Adjust throttle based on distance so faster ships don't overtake slower ones.
+                            Throttle = Remap(50f, 250f, .33f, .8f, distance);
+                        }
+                        else
+                            Throttle = 0.85f;*/
          }
-     }*/
+         else
+         {
+            TurnTowards(AttackTarget.transform.position);
+         }
+     }
     void Movement()
     {
-        transform.Rotate(Yaw * Time.deltaTime, Pitch * Time.deltaTime, Roll * Time.deltaTime);
-        transform.position += transform.forward * 300f * Throttle * Time.deltaTime;
+        transform.GetComponent<Rigidbody>().AddRelativeTorque(Pitch *  Multiplier, Yaw *  Multiplier, -Roll * Multiplier);
+        activeSpeed = Mathf.Lerp(activeSpeed, Throttle * 35, forwardAccerleration * Time.deltaTime);
+        transform.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * activeSpeed * 400f * Time.deltaTime);
+        //Vector3 predicted = transform.position + transform.forward * 300f * Throttle * Time.deltaTime;
+        //transform.position = Vector3.Slerp(transform.position, predicted, 10f);
     }
-    private void TurnTowards(Vector3 point, float power = 40f)
+    private void TurnTowards(Vector3 point, float power = 75f)
     {
         Vector3 localPosition = this.transform.InverseTransformPoint(point);
 
@@ -226,6 +277,7 @@ public class EnemyMovement : MonoBehaviour
     {
         target = GameObject.FindGameObjectWithTag("Player");
         FollowTarget = target.transform;
+
         /* potentialTargets.Clear();
          foreach (var target in Target.AllTargets)
          {
@@ -268,4 +320,16 @@ public class EnemyMovement : MonoBehaviour
          transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationDamp);
      }
  */
+    void Fire()
+    {
+        var hitDetection = Instantiate(weaponShot, this.transform.position, this.transform.rotation);
+        hitDetection.FireGun(this.transform.position, this.transform.rotation, transform.GetComponent<Rigidbody>().velocity, weaponForce, weaponSpread);
+    }
+
+    public static float Remap(float fromMin, float fromMax, float toMin, float toMax, float value)
+    {
+        float lerp = Mathf.InverseLerp(fromMin, fromMax, value);
+        return Mathf.Lerp(toMin, toMax, lerp);
+    }
 }
+
