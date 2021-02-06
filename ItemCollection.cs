@@ -72,6 +72,10 @@ public class ItemCollection : MonoBehaviour
                     LaserFire.laser2Ammo += 20;
                     LaserFire.currentWeaponAmmo += 20;
                     break;
+                case 3:
+                    LaserFire.laser3Ammo += 50;
+                    LaserFire.currentWeaponAmmo += 50;
+                    break;
             }
             Debug.Log("You have gained: " + ammoCount * 20 + " " + this.tag);
             Invoke("Initialize", waitTime);

@@ -16,7 +16,6 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         isPaused = false;
-        Debug.Log("this is working");
     }
 
     // Update is called once per frame
@@ -59,6 +58,15 @@ public class PauseMenu : MonoBehaviour
         SceneManager.LoadScene(0);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+        isPaused = false;
+    }
+
+    public void RestartLevel()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;
         isPaused = false;
     }
 }
