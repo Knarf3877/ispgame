@@ -47,10 +47,10 @@ public class LaserFire : MonoBehaviour
     static public int laser2Ammo = 50;
     static public int laser3Ammo = 200;
     static public int laser4Ammo = 50;
-    static public int defaultLaser1Ammo;
-    static public int defaultLaser2Ammo;
-    static public int defaultLaser3Ammo;
-    static public int defaultLaser4Ammo;
+    static public int defaultLaser1Ammo = 100;
+    static public int defaultLaser2Ammo = 50;
+    static public int defaultLaser3Ammo = 200;
+    static public int defaultLaser4Ammo = 50;
 
     public bool infiniteAmmo = false;
 
@@ -74,7 +74,7 @@ public class LaserFire : MonoBehaviour
 
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -107,6 +107,7 @@ public class LaserFire : MonoBehaviour
                         if (Time.time > laser1FireRate + timeLastFired)
                         {
                             FireLaser1();
+                            leftBarrel.GetComponent<AudioSource>().Play();
                             timeLastFired = Time.time;
                         }
                     }
@@ -117,6 +118,7 @@ public class LaserFire : MonoBehaviour
                         if (Time.time > laser2FireRate + timeLastFired)
                         {
                             FireLaser2();
+                            rightBarrel.GetComponent<AudioSource>().Play();
                             timeLastFired = Time.time;
                         }
                     }
@@ -127,6 +129,7 @@ public class LaserFire : MonoBehaviour
                         if (Time.time > laser3FireRate + timeLastFired)
                         {
                             FireLaser3();
+                            mainBarrel.GetComponent<AudioSource>().Play();
                             timeLastFired = Time.time;
                         }
                     }
@@ -137,6 +140,7 @@ public class LaserFire : MonoBehaviour
                         if (Time.time > laser4FireRate + timeLastFired)
                         {
                             FireLaser4();
+                            mainBarrel2.GetComponent<AudioSource>().Play();
                             timeLastFired = Time.time;
                         }
                     }

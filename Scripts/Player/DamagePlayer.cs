@@ -3,9 +3,9 @@
 public class DamagePlayer : MonoBehaviour
 {
     public static float playerHealth = 100;
-    public static float defaultPlayerHealth;
+    public static float defaultPlayerHealth = 100;
     public static float playerShield = 100;
-    public static float defaultPlayerShield;
+    public static float defaultPlayerShield = 100;
 
     public bool isImmune;
     //public static bool warpDeath;

@@ -9,29 +9,43 @@ public class EnemyStats : MonoBehaviour
 
     Respawn death;
     public GameObject deathFX;
-
+    public float respawnTime = 10;
+    public bool canRespawn;
 
     public Vector3 enemyPool;
     public Vector3 respawnLocation;
     public Quaternion respawnRotation;
+
     public static int totalDeaths = 0;
+    public static int turretDeaths = 0;
     void Start()
     {
-        totalDeaths = 0;
+        totalDeaths = PlayerPrefs.GetInt("eDeaths");
+        turretDeaths = PlayerPrefs.GetInt("tDeaths");
         health = defaultHealth;
         respawnLocation = transform.position;
         respawnRotation = transform.rotation;
+        PlayerPrefs.DeleteKey("eDeaths");
+        PlayerPrefs.DeleteKey("tDeaths");
     }
 
     // Update is called once per frame
     void Update()
     {
-        healthBar.fillAmount = health / 100;
+        healthBar.fillAmount = health / defaultHealth;
         if (health <= 0f)
         {
             DestroySelf();
             totalDeaths++;
-            Invoke("RespawnSelf", 10f);
+            PlayerPrefs.SetInt("eDeaths", totalDeaths);
+            PlayerPrefs.Save();
+            if (this.tag == "Turret") {
+                turretDeaths++;
+                PlayerPrefs.SetInt("tDeaths", turretDeaths);
+                PlayerPrefs.Save();
+            }
+            if(canRespawn)
+              Invoke("RespawnSelf", respawnTime);
         }
     }
     void OnTriggerEnter(Collider triggerCollider)
@@ -42,7 +56,9 @@ public class EnemyStats : MonoBehaviour
         {
             DamagePlayer.playerHealth -= 100;
             DestroySelf();
-            Invoke("RespawnSelf", 10f);
+
+            if (canRespawn)
+                Invoke("RespawnSelf", respawnTime);
         }
     }
     public void ApplyDamage(float damage)

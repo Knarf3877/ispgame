@@ -14,44 +14,77 @@ public class MainMenu : MonoBehaviour
     public GameObject levels;
     public GameObject settings;
     public AudioMixer audioMixer;
-   // public Slider volume;
+    public AudioMixer sfxMixer;
+    GameObject audioSlider;
+    GameObject sfxSlider;
+    GameObject quality;
+    GameObject fullscreenToggle;
+
+    public GameObject showLives;
+    Transform livesSlider;
+    Transform difficultySlider;
+    public GameObject showDifficulty;
+    // public Slider volume;
     public TMP_Dropdown resolutionDropdown;
     //public GameObject[] selectLevel;
-    public Resolution[] resolutions;
-    bool isFirstTime = true;
+    int[] resolutionsWidth = { 720, 960, 1280, 1600, 1800, 1920 };
+    int[] resolutionsHeight = { 400, 540, 720, 900, 1050, 1080 };
 
     private void Start()
     {
-        
+        fullscreenToggle = GameObject.Find("Fullscreen Toggle");
+        quality = GameObject.Find("Quality Dropdown");
+        audioSlider = GameObject.Find("Slider");
+        sfxSlider = GameObject.Find("Slider Sfx");
         mainMenu.SetActive(true);
         info.SetActive(false);
         levels.SetActive(false);
-        int currentResIndex = 0;
-       if (isFirstTime)
-        {
-            Screen.SetResolution(Screen.width, Screen.height, false);
-            resolutions = Screen.resolutions;
-
-            resolutionDropdown.ClearOptions();
-            List<string> options = new List<string>();
-
-            for (int i = 0; i < resolutions.Length; i++)
-            {
-                string Option = resolutions[i].width + "x" + resolutions[i].height;
-                options.Add(Option);
-
-                if (resolutions[i].width == Screen.currentResolution.width &&
-                    resolutions[i].height == Screen.currentResolution.height)
-                {
-                    currentResIndex = i;
-                }
-            }
-            resolutionDropdown.AddOptions(options);
-            resolutionDropdown.value = currentResIndex;
-            resolutionDropdown.RefreshShownValue();
-            isFirstTime = false;
-        }
         settings.SetActive(false);
+
+        if (PlayerPrefs.GetFloat("lives") == 0)
+        {
+            SetLives(3);
+        }
+        else
+        {
+            SetLives(PlayerPrefs.GetFloat("lives"));
+            livesSlider = showLives.transform.parent;
+            livesSlider.GetComponent<Slider>().value = PlayerPrefs.GetFloat("lives");
+        }
+
+        if (PlayerPrefs.GetFloat("difficulty") == 0)
+        {
+            SetDifficulty(1);
+        }
+        else
+        {
+            SetDifficulty(PlayerPrefs.GetFloat("difficulty"));
+            difficultySlider = showDifficulty.transform.parent;
+            difficultySlider.GetComponent<Slider>().value = PlayerPrefs.GetFloat("difficulty");
+        }
+        if(PlayerPrefs.GetInt("resolution") != 0)
+        {
+            resolutionDropdown.GetComponent<TMP_Dropdown>().value = PlayerPrefs.GetInt("resolution");
+        }
+        if(PlayerPrefs.GetInt("isFullscreen") == 1)
+        {
+           // fullscreenToggle = GameObject.Find("Fullscreen Toggle");
+            fullscreenToggle.GetComponent<Toggle>().isOn = true;
+        }
+        if(PlayerPrefs.GetInt("quality") != 0)
+        {
+            //quality = GameObject.Find("Quality Dropdown");
+            quality.GetComponent<TMP_Dropdown>().value = PlayerPrefs.GetInt("quality") - 1;
+        }
+        if (PlayerPrefs.GetFloat("MasterVolume") != 0){
+           // audioSlider = GameObject.Find("Slider");
+            audioSlider.GetComponent<Slider>().value = PlayerPrefs.GetFloat("MasterVolume");
+        }
+        if (PlayerPrefs.GetFloat("SFXVolume") != 0)
+        {
+            //sfxSlider = GameObject.Find("Slider Sfx");
+            sfxSlider.GetComponent<Slider>().value = PlayerPrefs.GetFloat("SFXVolume");
+        }
 
     }
 
@@ -66,14 +99,14 @@ public class MainMenu : MonoBehaviour
     }
     public void PlayGame()
     {
-       
+
         mainMenu.SetActive(false);
         levels.SetActive(true);
     }
 
     public void Info()
     {
-       
+
         mainMenu.SetActive(false);
         info.SetActive(true);
     }
@@ -94,7 +127,7 @@ public class MainMenu : MonoBehaviour
         if (!mainMenu.activeSelf)
         {
             mainMenu.SetActive(!mainMenu.activeSelf);
-           // gameObject.SetActive(!this.gameObject.activeSelf);
+            // gameObject.SetActive(!this.gameObject.activeSelf);
             settings.SetActive(false);
             info.SetActive(false);
             levels.SetActive(false);
@@ -110,23 +143,81 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + currentValue);
     }
 
-    public void SetScreenRes(int resIndex) {
-      
-        Resolution resolution = resolutions[resIndex];
-        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+    public void SetScreenRes(int resIndex)
+    {
+
+        // Resolution resolution = resolutions[resIndex];
+        Screen.SetResolution(resolutionsWidth[resIndex], resolutionsHeight[resIndex], Screen.fullScreen);
+        PlayerPrefs.SetInt("resolution", resIndex);
+        PlayerPrefs.Save();
     }
 
-    public void SetFullscreen(bool isFullscreen) {
+    public void SetFullscreen(bool isFullscreen)
+    {
         Screen.fullScreen = isFullscreen;
         Debug.Log(isFullscreen);
+        if (isFullscreen == true)
+        {
+            PlayerPrefs.SetInt("isFullscreen", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("isFullscreen", 0);
+        }
+        PlayerPrefs.Save();
     }
 
-    public void SetQuality(int quality) {
+    public void SetQuality(int quality)
+    {
         QualitySettings.SetQualityLevel(quality);
+        PlayerPrefs.SetInt("quality", quality + 1);
+        PlayerPrefs.Save();
     }
 
-    public void SetVolume(float value) {
-        Debug.Log(value);
+    public void SetVolume(float value)
+    {
+       // Debug.Log(value);
         audioMixer.SetFloat("MasterVolume", value);
+        PlayerPrefs.SetFloat("MasterVolume", value);
+        PlayerPrefs.Save();
+
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        sfxMixer.SetFloat("SFXVolume", value);
+        PlayerPrefs.SetFloat("SFXVolume", value);
+        PlayerPrefs.Save();
+    }
+    public void SetLives(float lives)
+    {
+        PlayerPrefs.SetFloat("lives", lives);
+        Debug.Log(PlayerPrefs.GetFloat("lives"));
+        PlayerPrefs.Save();
+        showLives.GetComponent<TMP_Text>().text = "Lives: " + PlayerPrefs.GetFloat("lives");
+    }
+
+    public void SetDifficulty(float hardness)
+    {
+        PlayerPrefs.SetFloat("difficulty", hardness);
+        Debug.Log(PlayerPrefs.GetFloat("difficulty"));
+        PlayerPrefs.Save();
+        switch (hardness)
+        {
+            case 1f:
+                showDifficulty.GetComponent<TMP_Text>().text = "Easy";
+                break;
+            case 2f:
+                showDifficulty.GetComponent<TMP_Text>().text = "Medium";
+                break;
+            case 3f:
+                showDifficulty.GetComponent<TMP_Text>().text = "Hard";
+                break;
+            default:
+                showDifficulty.GetComponent<TMP_Text>().text = "Difficulty not found";
+                break;
+
+
+        }
     }
 }

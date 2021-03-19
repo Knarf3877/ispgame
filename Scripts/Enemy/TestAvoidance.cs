@@ -122,10 +122,10 @@ public class TestAvoidance : MonoBehaviour
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
         {
-            Debug.Log("True");
+           // Debug.Log("True");
             return true;
         }
-        else { Debug.Log("False"); }
+        //else { Debug.Log("False"); }
         return false;
     }
 

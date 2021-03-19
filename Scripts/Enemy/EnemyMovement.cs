@@ -43,11 +43,11 @@ public class EnemyMovement : MonoBehaviour
     private float timeLastFired;
 
     private float laser1Force = 1200f;
-    private float laser1FireRate = .15f;
+    private float laser1FireRate = .2f;
     [SerializeField] private float l1Spread = 0.15f;
 
     private float laser2Force = 1500f;
-    private float laser2FireRate = .3f;
+    private float laser2FireRate = .4f;
     [SerializeField] private float l2Spread = 0f;
 
     private float laser3Force = 1200f;
@@ -55,7 +55,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float l3Spread = 0.5f;
 
     private float laser4Force = 1200f;
-    private float laser4FireRate = .4f;
+    private float laser4FireRate = .5f;
     [SerializeField] private float l4Spread = 1f;
 
     //public Target ownTarget = null;
@@ -119,6 +119,7 @@ public class EnemyMovement : MonoBehaviour
         if (IsFiring && (Time.time > weaponFireRate + timeLastFired))
         {
             Fire();
+            barrel.GetComponent<AudioSource>().Play();
             timeLastFired = Time.time;
         }
 

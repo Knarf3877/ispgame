@@ -9,7 +9,7 @@ public class Refueler : MonoBehaviour
     void Start()
     {
         StartCoroutine(AutoRefuel());
-        Debug.Log("this works");
+        Debug.Log("Refueling active");
     }
 
 
