@@ -7,7 +7,6 @@ public class EnemyStats : MonoBehaviour
     public float health = 100;
     public float defaultHealth = 100;
 
-    Respawn death;
     public GameObject deathFX;
     public float respawnTime = 10;
     public bool canRespawn;

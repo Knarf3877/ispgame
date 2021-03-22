@@ -15,7 +15,6 @@ public class EnemyMovement : MonoBehaviour
 
     private float lastTargetCheck;
     private float thinkDelay;
-    private Vector3 forward;
     //public LayerMask obstacleMask;
 
     [Header("Combat")]
@@ -61,7 +60,6 @@ public class EnemyMovement : MonoBehaviour
     //public Target ownTarget = null;
     //public Ship ownShip = null;
     private GameObject target;
-    private Vector3 targetPoint;
 
 
     // private float lastTargetCheck = 0f;
@@ -71,6 +69,7 @@ public class EnemyMovement : MonoBehaviour
 
     private Vector3 preferredAvoidOffset = Vector3.right * 350f;
     private float seed = 0f;
+    [SerializeField] private float avoidMulti = 2f;
 
     public bool IsFireAllowed => Mathf.PerlinNoise(seed, Time.time / 10f) < FireChance;
 
@@ -279,9 +278,10 @@ public class EnemyMovement : MonoBehaviour
     void FixedUpdate()
     {
         RunAI();
-        Avoid();
+        Move();  
         Turn();
-        Move();
+        Avoid();
+        
 
     }
 
@@ -301,7 +301,7 @@ public class EnemyMovement : MonoBehaviour
         RaycastHit hit;
         Vector3 avoidTarget = (transform.forward).normalized;
 
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 80f))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 100f))
         {
             if (hit.transform != transform || hit.transform.tag != "Player")
             {
@@ -312,7 +312,7 @@ public class EnemyMovement : MonoBehaviour
                 //transform.GetComponent<Rigidbody>().AddRelativeTorque(avoidTarget * Time.deltaTime * 50f);
             }
         }
-        else if (distance > 90)
+        else if (distance > 100)
         {
             if (Time.time > lastTargetCheck + thinkDelay)
             {
@@ -351,7 +351,7 @@ public class EnemyMovement : MonoBehaviour
 
         }
         Quaternion torotation = Quaternion.LookRotation(avoidTarget);
-        transform.rotation = Quaternion.Slerp(transform.rotation, torotation, Time.deltaTime * 2f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, torotation, Time.deltaTime * avoidMulti);
 
     }
 

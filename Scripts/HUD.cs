@@ -9,7 +9,6 @@ public class HUD : MonoBehaviour
     public GameObject weaponText;
     public GameObject lifeText;
     public GameObject missionText;
-    private float avgFrameRate;
     public Image healthBar;
     public Image shieldBar;
     static public int lives;
@@ -17,15 +16,21 @@ public class HUD : MonoBehaviour
     /// <summary>
     /// 1 - kill enemies
     /// 2 - destroy targets
+    /// 3 - finish tutorial
     /// </summary>
     public int missionType;
     int requiredKills;
     public GameObject levelWin;
+    public bool isTutorial;
 
     private void Start()
     {
         requiredKills = KillsToDifficulty((int)PlayerPrefs.GetFloat("difficulty"));
         // avgFrameRate = 0;
+        if (isTutorial)
+        {
+            requiredKills = 1;
+        }
         lives = (int)PlayerPrefs.GetFloat("lives");
     }
     private void Update()
@@ -43,7 +48,11 @@ public class HUD : MonoBehaviour
 
         lifeText.GetComponent<TMP_Text>().text = "Lives: " + lives;
         missionText.GetComponent<TMP_Text>().text = MissionObjective(missionType);
+        if (missionType == 3 && EnemyStats.totalDeaths == requiredKills)
+        {
+            levelWin.GetComponent<PauseMenu>().LevelComplete();
 
+        }
         if ((missionType == 1 && EnemyStats.totalDeaths == requiredKills) || (missionType == 2 && EnemyStats.turretDeaths == 32))
         {
             levelWin.GetComponent<PauseMenu>().LevelComplete();
@@ -72,11 +81,6 @@ public class HUD : MonoBehaviour
         }
     }
 
-    private void LivesLeft()
-    {
-
-
-    }
     private int KillsToDifficulty(int difficulty)
     {
         switch (difficulty)
@@ -101,6 +105,8 @@ public class HUD : MonoBehaviour
                 return "Mission Objective:\n" + "Defeat Enemy Fighters " + PlayerPrefs.GetInt("eDeaths").ToString("F0") + "/" + requiredKills;
             case 2:
                 return "Mission Objective:\n" + "Destroy Turrets " + PlayerPrefs.GetInt("tDeaths").ToString("F0") + "/32";
+            case 3:
+                return "Mission Objective:\n" + "Complete Tutorial " + PlayerPrefs.GetInt("eDeaths").ToString("F0") + "/" + 1;
             default:
                 return "mission not found";
 

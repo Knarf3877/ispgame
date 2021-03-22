@@ -68,17 +68,17 @@ public class HitDetection : MonoBehaviour
         RaycastHit rayHit;
         Ray velocityRay = new Ray(transform.position, velocity.normalized);
         bool rayHasHit = Physics.Raycast(velocityRay, out rayHit, velocity.magnitude * kVelocityMult * Time.deltaTime, hitMask);
-        
+
         if (rayHasHit == true)
         {
 
             GameObject rayHitGameObject = rayHit.transform.gameObject;
             EnemyStats target = rayHitGameObject.GetComponent<EnemyStats>();
-          //  bool hitSelf = false;
+            //  bool hitSelf = false;
             if (target)
             {
-                    print("Hit " + target.name + " with " + target.health + " HP left.");
-                    target.ApplyDamage(damage);
+                print("Hit " + target.name + " with " + target.health + " HP left.");
+                target.ApplyDamage(damage);
             }
 
             DestroyBullet(rayHit.point, true);
@@ -96,20 +96,11 @@ public class HitDetection : MonoBehaviour
     {
         if (fromImpact == true && explodeFX != null)
         {
-            ParticleSystem tempExplodeFX = Instantiate(explodeFX, transform.position, transform.rotation);   
+            ParticleSystem tempExplodeFX = Instantiate(explodeFX, transform.position, transform.rotation);
             Destroy(tempExplodeFX.gameObject, 1f);
 
         }
-        Destroy(gameObject);        
-    }
-/*    private void OnCollisionEnter(Collision collision)
-    {
-        ContactPoint contact = collision.contacts[0];
-        Vector3 contactPoint = contact.point;
         Destroy(gameObject);
-        Debug.Log("Laser Hit");
-        GameObject smallExplosion = Instantiate(explodeFX, contactPoint, this.transform.rotation * Quaternion.Euler(0,-90,0));
-        Destroy(smallExplosion, 5f);
-    }*/
+    }
 
 }

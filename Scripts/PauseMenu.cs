@@ -15,13 +15,15 @@ public class PauseMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        AudioListener.pause = false;
         isWon = false;
         if (Time.timeScale != 1)
             Time.timeScale = 1;
 
-        if (winMenu.activeSelf)
+        if (winMenu.activeSelf == true)
             winMenu.SetActive(false);
-        AudioListener.pause = false;
+
+
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         isPaused = false;

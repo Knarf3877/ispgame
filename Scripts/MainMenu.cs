@@ -17,7 +17,7 @@ public class MainMenu : MonoBehaviour
     public AudioMixer sfxMixer;
     GameObject audioSlider;
     GameObject sfxSlider;
-    GameObject quality;
+    public GameObject quality;
     GameObject fullscreenToggle;
 
     public GameObject showLives;
@@ -32,10 +32,11 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
+        AudioListener.pause = false;
         fullscreenToggle = GameObject.Find("Fullscreen Toggle");
-        quality = GameObject.Find("Quality Dropdown");
         audioSlider = GameObject.Find("Slider");
         sfxSlider = GameObject.Find("Slider Sfx");
+       // quality = GameObject.Find("Quality Dropdown");
         mainMenu.SetActive(true);
         info.SetActive(false);
         levels.SetActive(false);

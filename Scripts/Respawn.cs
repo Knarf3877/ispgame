@@ -20,7 +20,6 @@ public class Respawn : MonoBehaviour
     public GameObject loseMenu;
     public GameObject loseText;
 
-    private UnifiedPlayerControl fuel;
     void Start()
     {
         isDead = false;
