@@ -20,12 +20,14 @@ public class HUD : MonoBehaviour
     /// </summary>
     public int missionType;
     int requiredKills;
+    int turretKills;
     public GameObject levelWin;
     public bool isTutorial;
 
     private void Start()
     {
         requiredKills = KillsToDifficulty((int)PlayerPrefs.GetFloat("difficulty"));
+        turretKills = TurretKillsToDifficulty((int)PlayerPrefs.GetFloat("difficulty"));
         // avgFrameRate = 0;
         if (isTutorial)
         {
@@ -53,7 +55,7 @@ public class HUD : MonoBehaviour
             levelWin.GetComponent<PauseMenu>().LevelComplete();
 
         }
-        if ((missionType == 1 && EnemyStats.totalDeaths == requiredKills) || (missionType == 2 && EnemyStats.turretDeaths == 32))
+        if ((missionType == 1 && EnemyStats.totalDeaths == requiredKills) || (missionType == 2 && EnemyStats.turretDeaths == turretKills))
         {
             levelWin.GetComponent<PauseMenu>().LevelComplete();
         }
@@ -94,7 +96,20 @@ public class HUD : MonoBehaviour
             default:
                 return 100;
         }
-
+    }
+    private int TurretKillsToDifficulty(int difficulty)
+    {
+        switch (difficulty)
+        {
+            case 1:
+                return 10;
+            case 2:
+                return 20;
+            case 3:
+                return 32;
+            default:
+                return 32;
+        }
     }
     private string MissionObjective(int type)
     {
@@ -104,7 +119,7 @@ public class HUD : MonoBehaviour
             case 1:
                 return "Mission Objective:\n" + "Defeat Enemy Fighters " + PlayerPrefs.GetInt("eDeaths").ToString("F0") + "/" + requiredKills;
             case 2:
-                return "Mission Objective:\n" + "Destroy Turrets " + PlayerPrefs.GetInt("tDeaths").ToString("F0") + "/32";
+                return "Mission Objective:\n" + "Destroy Turrets " + PlayerPrefs.GetInt("tDeaths").ToString("F0") + "/" + turretKills;
             case 3:
                 return "Mission Objective:\n" + "Complete Tutorial " + PlayerPrefs.GetInt("eDeaths").ToString("F0") + "/" + 1;
             default:
